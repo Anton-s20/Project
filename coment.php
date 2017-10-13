@@ -1,60 +1,71 @@
-<?php
+﻿<?php
 session_start();
 ob_start();
 
-try{
-	$pdo = new PDO("mysql:dbname=new_project;host=localhost","root","");
-}catch(PDOException $e) {
-	echo "Возникла ошибка соединения: ".$e->getMessage();
-	exit;
+// try{
+// 	$pdo = new PDO("mysql:dbname=new_project;host=localhost;charset=utf-8","root","");
+// }catch(PDOException $e) {
+// 	echo "Возникла ошибка соединения: ".$e->getMessage();
+// 	exit;
+// }
+
+class Database {
+	public $datab;
+    public function __construct($username, $password){
+        try {
+             $this->datab = new PDO('mysql:dbname=new_project;host=localhost;charset=utf-8',$username, $password);
+        } catch (PDOException $e) {
+            echo "Возникла ошибка соединения: ".$e->getMessage();
+			exit;
+        }
+    }
+	public function test($data){
+			 $array=array();
+			 $subject = trim($data ['subject']);
+			 $coments = trim($data ['coments']);
+			 $data_time = date('Y-m-d H:i:s');
+			 $activated =0;
+			 if ($subject!="" && $coments!=""){
+				 $users_id = $_SESSION['users_id'];
+				 $query = "INSERT INTO users_coments (subject, coments, date, users_id, activated) 
+		 		 VALUES (:subject, :coments, :data_time, :users_id, :activated)";
+				 $result = $this->datab->prepare($query);
+				 $result->bindParam(':users_id', $users_id, PDO:: PARAM_INT);
+				 $result->bindParam(':subject',  $subject,  PDO:: PARAM_STR);
+				 $result->bindParam(':coments',  $coments,  PDO:: PARAM_STR);
+				 $result->bindParam(':data_time',$data_time,PDO:: PARAM_STR);
+				 $result->bindParam(':activated',$activated,PDO:: PARAM_INT);
+				 $result->execute();
+			 }else{
+			 	 $array['null_tema_coment'] ="Заполните все поля формы!";
+			 }
+			 if ($result != false){
+			 	 	$array['otpravil'] ="Вы успешно отправили коментарий!".'<br />'."Он будет добавлен администрацией в скором времени.";
+			 }
+			 return $array;
+			 
+	}
 }
+$con = new Database('root','');
 
-if(!empty($_SESSION["users_id"])){	
-	$array=array();
+$array = array('null_tema_coment' => '', 'otpravil' => '');
+
+if(!empty($_SESSION["users_id"])){
 	if (!empty($_POST)){
-		$subject = trim($_POST ['subject']);
-		$coments = trim($_POST ['coments']);
-		$data_time= date('Y-m-d H:i:s');
-		$activated =0;
-
-		if ($subject!="" && $coments!=""){
-			$users_id = $_SESSION['users_id'];
-			$query = "INSERT INTO users_coments (subject, coments, date, users_id, activated) 
-		 	VALUES (:subject, :coments,:data_time,:users_id, :activated)";
-			$result = $pdo->prepare($query);
-
-			$result->bindParam(':users_id', $users_id,PDO:: PARAM_INT);
-			$result->bindParam(':subject',  $subject,PDO:: PARAM_STR);
-			$result->bindParam(':coments', 	$coments,PDO:: PARAM_STR);
-			$result->bindParam(':data_time',$data_time,PDO:: PARAM_STR);
-			$result->bindParam(':activated',$activated,PDO:: PARAM_INT);
-			$result->execute();
-		}else{
-			$array['null_tema_coment']="Заполните все поля формы!";
-		}
-
-		if ($result != false){
-			$array['otpravil']="Вы успешно отправили коментарий!".'<br />'."Он будет добавлен администрацией в скором времени.";
-		}
+		$array=$con->test($_POST);
 
 	}
 }
-
-
-
 $query_2 = "SELECT * FROM users_coments WHERE activated=1";
-$result_2 = $pdo->prepare($query_2);
+$result_2 = $con->datab->prepare($query_2);
 $result_2->execute();
-
-
-     
-?>     
+?>
 <!DOCTYPE html>
 <html>
 <head>
-	<html lang="ru">
-	<meta charset="utf-8">
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <html lang="ru">
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- jQuery -->
@@ -125,10 +136,9 @@ $result_2->execute();
 		<?php  if (!empty($_SESSION["users_id"])) { ?>
 	<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
 		<?php  
-  			require_once 'include/menu.php';
+  			 require_once 'include/menu.php';
 		?>
 	</div>
-
 	<div class="col-sm-6 ">
 		<form class="form-horizontal" onSubmit="valid(); return false;" action="coment.php" method="POST" id='comentform'>
 			<div class="form-group">
@@ -147,14 +157,15 @@ $result_2->execute();
 			<br /><br />
 			</div>
 			<div class="error">
-			<?php
-				echo $array['null_tema_coment'];
-			?>
+				<?php
+					echo $array['null_tema_coment'];
+					
+				?>
 			</div>
 			<div class="success">
-			<?php
-				echo $array['otpravil'];
-			?>
+				<?php
+					echo $array['otpravil'];
+				?>
 			</div>
 			<br />
 			<input type="submit" class="btn btn-success" name="button" value="Отправить"><br /><br />
@@ -180,12 +191,11 @@ $result_2->execute();
 
 							while ($qwe =  $result_2->fetch(PDO::FETCH_ASSOC)){
 
-
-								$users_id =$qwe['users_id'];
+								$users_id = $qwe['users_id'];
 		
 								$query_3 = "SELECT * FROM users WHERE users_id='$users_id' AND activated=1";
 
-								$result_3 =$pdo->prepare($query_3);
+								$result_3 = $con->datab->prepare($query_3);
 								$result_3->execute();
 
 								$qwe_2 = ($result_3->fetch(PDO::FETCH_ASSOC));
