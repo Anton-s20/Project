@@ -1,4 +1,4 @@
- <?php
+<?php
 
 try{
 	$pdo = new PDO("mysql:dbname=new_project;host=localhost","root","");
