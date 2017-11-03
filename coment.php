@@ -126,8 +126,6 @@ $result_2->execute();
 		}
 
 	</script>
-
-</head>
 <body role="document">
 	<div class="container"><br /><br />
 	<h2>Страница коментариев</h2>

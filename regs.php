@@ -17,9 +17,11 @@ if (!empty($_POST)){
 	$minEmail_length = 3;
 	$maxEmail_length = 15;
 	if (!filter_var($email , FILTER_VALIDATE_EMAIL)){
+		$message = "error";
 	 	$array['incorrect_email']="Cтрокa Адрес электронной почты должна быть правильной!<br />";
 
-	}else if ($email_length <= $minEmail_length || $email_length >= $maxEmail_length){	
+	}else if ($email_length <= $minEmail_length || $email_length >= $maxEmail_length){
+		$message = "error";
 		$array['incorrect_email']="Заполните полe Адрес электронной почты, не меньше 4-х символов и не больше 15!<br />";
 	}
 
@@ -28,6 +30,7 @@ if (!empty($_POST)){
 	$minfirst_name_length = 3;
 	$maxfirst_name_length = 15;
 	if ($first_name_length <= $minfirst_name_length || $first_name_length >= $maxfirst_name_length){
+		$message = "error";
 		$array['incorrect_first_name']="Строка Имя должна иметь не меньше 4-х символов и не больше 15!<br />";
 	}
 		  
@@ -36,6 +39,7 @@ if (!empty($_POST)){
 	$minlast_name_length = 3;
 	$maxlast_name_length = 15;
 	if ($last_name_length <= $minlast_name_length || $last_name_length >= $maxlast_name_length){
+		$message = "error";
 		$array['incorrect_last_name']="Строка 'Фамилия' должна иметь не меньше 4-х символов и не больше 15!<br />";
 	}
 	 	 
@@ -44,6 +48,7 @@ if (!empty($_POST)){
 	$minlogin_length = 3;
 	$maxlogin_length = 15;
 	if ($login_length <= $minlogin_length || $login_length >= $maxlogin_length){
+			$message = "error";
 			$array['incorrect_login']="Строка 'Логин' должна иметь не меньше 4-х символов и не больше 15!<br />";
 	}
 	 	
@@ -52,6 +57,7 @@ if (!empty($_POST)){
 	$minpassword_length = 3;
 	$maxpassword_length = 15;
 	if ($password_length <= $minpassword_length || $password_length >= $maxpassword_length){
+		$message = "error";
 		$array['incorrect_password']="Строка 'Пароль' должна иметь не меньше 4-х символов и не больше 15!<br />";
 	}
 	 
@@ -60,26 +66,33 @@ if (!empty($_POST)){
 	$minpassword_2_length = 3;
 	$maxpassword_2_length = 15;
 	if ($password_2_length <= $minpassword_2_length || $password_2_length >= $maxpassword_2_length){
+		$message = "error";
 		$array['incorrect_password']="Строка Повторить пароль должна иметь не меньше 4-х символов и не больше 15!<br />";
 	}
 				
 	if ($users_password != $users_password_2){
+			$message = "error";
 			$array['incorrect_password_2']="Повторите пароль правильно!<br />";
 	}
 	if ($email ==""){
-				$array['incorrect_email']="Заполните поле Адрес электронной почты!<br />";
+			$message = "error";
+			$array['incorrect_email']="Заполните поле Адрес электронной почты!<br />";
 	}
 	if ($first_name==""){
-			   $array['incorrect_first_name']="Заполните полe Имя!<br />";
+			$message = "error";
+			$array['incorrect_first_name']="Заполните полe Имя!<br />";
 	}
 	if ($last_name==""){
-			   $array['incorrect_last_name']="Заполните полe Фамилия!<br />";
+			$message = "error";
+			$array['incorrect_last_name']="Заполните полe Фамилия!<br />";
 	}
 	if ($users_login==""){
-			   $array['incorrect_login']="Заполните поле  Логин!<br />";			
+			$message = "error";
+			$array['incorrect_login']="Заполните поле  Логин!<br />";			
 	} 
 	if ($users_password==""){
-					$array['incorrect_password']="Заполните поле Пароль!<br />";
+			$message = "error";
+			$array['incorrect_password']="Заполните поле Пароль!<br />";
 	} 
 	if ($message ==""){
 		$hash = md5(date('H:i:s Y-m-d'));
@@ -322,7 +335,7 @@ if (!empty($_POST)){
 		 	$("#formregs").submit();
 		}
 
-	}
+		}
 	 </script>
 
 </head>
